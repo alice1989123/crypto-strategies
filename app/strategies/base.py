@@ -16,3 +16,5 @@ class BaseStrategy(ABC):
         }
         """
         pass
+    def justification_text(self, signal: dict) -> str:
+        return "No specific justification provided."
