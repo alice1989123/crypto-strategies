@@ -9,9 +9,9 @@ load_dotenv(".env")
 def save_strategy_signal(coin: str, model_name: str, signal: dict):
     conn = psycopg2.connect(
         dbname="crypto_predictions",
-        user=os.getenv("DB_USER"),
-        password=os.getenv("DB_PASSWORD"),
-        host=os.getenv("DB_HOST")
+        user=os.getenv("DBUSER"),
+        password=os.getenv("DBPASSWORD"),
+        host=os.getenv("DBHOST")
     )
     cursor = conn.cursor()
 

@@ -7,9 +7,9 @@ dotenv.load_dotenv(".env")
 def fetch_latest_prediction_with_metadata(coin: str, model_name: str):
     conn = psycopg2.connect(
         dbname="crypto_predictions",
-        user=os.getenv("DB_USER"),
-        password=os.getenv("DB_PASSWORD"),
-        host=os.getenv("DB_HOST"),
+        user=os.getenv("DBUSER"),
+        password=os.getenv("DBPASSWORD"),
+        host=os.getenv("DBHOST"),
     )
     cursor = conn.cursor()
 
@@ -49,9 +49,9 @@ def get_stored_klines(coin: str, start: str, end: str, interval: str = "1h") -> 
 
     conn = psycopg2.connect(
         dbname="crypto_predictions",
-        user=os.getenv("DB_USER"),
-        password=os.getenv("DB_PASSWORD"),
-        host=os.getenv("DB_HOST"),
+        user=os.getenv("DBUSER"),
+        password=os.getenv("DBPASSWORD"),
+        host=os.getenv("DBHOST"),
     )
     query = """
         SELECT open_time, close
