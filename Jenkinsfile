@@ -16,7 +16,7 @@ spec:
   }
 
   environment {
-    IMAGE_BASE = 'registry-docker-registry.registry.svc.cluster.local:5000/klines-etl'
+    IMAGE_BASE = 'registry-docker-registry.registry.svc.cluster.local:5000/crypto-strategies'
   }
 
   stages {
