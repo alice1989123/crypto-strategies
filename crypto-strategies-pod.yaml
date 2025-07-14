@@ -1,0 +1,26 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: test-crypto-strategies
+  namespace: production
+  labels:
+    app: crypto-strategies
+spec:
+  restartPolicy: Never
+  containers:
+    - name: crypto-strategies
+      image: registry-docker-registry.registry.svc.cluster.local:5000/crypto-strategies:latest
+      command: ["/bin/bash", "-c"]
+      args:
+        - |
+          export PYTHONPATH=/app && \
+          echo "Starting runner.sh..." && \
+          cd /app && ./runner.sh || echo "runner.sh failed" && \
+          echo "Sleeping for debug..." && sleep 3600
+      envFrom:
+        - secretRef:
+            name: db-creds
+        - secretRef:
+            name: aws-credentials-dynamo
+        - secretRef:
+            name: telegram
