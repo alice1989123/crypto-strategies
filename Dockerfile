@@ -11,8 +11,7 @@ WORKDIR /app
 COPY requirements.txt ./
 RUN pip install --no-cache-dir -r requirements.txt
 
-COPY ./src ./src
-COPY ./keys ./keys
-COPY backfill_runner.sh .
-RUN chmod +x /app/backfill_runner.sh
-ENTRYPOINT ["/app/backfill_runner.sh"]
+COPY ./app/ .
+COPY runner.sh .
+RUN chmod +x /app/runner.sh
+ENTRYPOINT ["runner.sh"]
