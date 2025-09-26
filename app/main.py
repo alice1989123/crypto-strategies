@@ -19,7 +19,7 @@ async def main():
     start = end - timedelta(days=21)
     for coin in coins:
         print(f"🔍 Fetching predictions for {coin}...")
-        model = "LSTMModel"
+        model = "GRU"
 
         historical, forecast, metadata = fetch_latest_prediction_with_metadata(coin, model)
 
