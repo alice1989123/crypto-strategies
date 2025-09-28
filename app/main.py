@@ -5,7 +5,6 @@ import argparse
 from app.db.fetch import fetch_latest_prediction_with_metadata, get_stored_klines
 from app.strategies.forecast import ForecastStrategy
 from app.db.strategy import save_strategy_signal
-from app.db.get_all_tracked_coins import get_all_tracked_coins
 from app.notifications.telegram import send_strategy_signal_via_telegram
 from app.strategies.rsi_momentum import RSIMomentumStrategy
 
@@ -53,25 +52,17 @@ async def run_for_coin(coin: str, since_days: int = 21):
 async def main():
     parser = argparse.ArgumentParser(description="Run strategies and emit signals.")
     parser.add_argument("--symbol", help="Single symbol, e.g. BTCUSDT")
-    parser.add_argument("--symbols", help="Comma-separated symbols, e.g. BTCUSDT,ETHUSDT")
     parser.add_argument("--since-days", type=int, default=21, help="History window in days (default: 21)")
     args = parser.parse_args()
-
-    # Resolve target list
-    if args.symbol:
-        coins = [args.symbol.strip().upper()]
-    elif args.symbols:
-        coins = [c.strip().upper() for c in args.symbols.split(",") if c.strip()]
-    else:
-        coins = get_all_tracked_coins()
+    coin = args.symbol
 
     # Run sequentially (simple & deterministic). If you want, gather() to parallelize.
-    for coin in coins:
-        try:
-            await run_for_coin(coin, since_days=args.since_days)
-        except Exception as e:
-            # don't stop the whole batch on one failure
-            print(f"❌ Error processing {coin}: {e}")
+    
+    try:
+        await run_for_coin(coin, since_days=args.since_days)
+    except Exception as e:
+        # don't stop the whole batch on one failure
+        print(f"❌ Error processing {coin}: {e}")
 
 if __name__ == "__main__":
     asyncio.run(main())
