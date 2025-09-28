@@ -54,7 +54,9 @@ async def main():
     parser.add_argument("--symbol", help="Single symbol, e.g. BTCUSDT")
     parser.add_argument("--since-days", type=int, default=21, help="History window in days (default: 21)")
     args = parser.parse_args()
-    coin = args.symbol
+    coin = args.symbol 
+    if not coin:
+        raise ValueError("--symbol is required")
 
     # Run sequentially (simple & deterministic). If you want, gather() to parallelize.
     
