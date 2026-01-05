@@ -15,10 +15,14 @@ def fetch_latest_prediction_with_metadata(coin: str, model_name: str):
 
     # Fetch the latest metadata entry
     cursor.execute("""
-        SELECT id, metadata_json FROM prediction_metadata
-        WHERE coin = %s AND model_name = %s
-        ORDER BY created_at DESC LIMIT 1
-    """, (coin, model_name))
+    SELECT id, metadata_json
+    FROM prediction_metadata
+    WHERE coin = %s
+      AND model_name = %s
+      AND "interval" = '1h'
+    ORDER BY created_at DESC
+    LIMIT 1
+    """, (coin, model_name, "1h"))
     row = cursor.fetchone()
 
     if not row:
