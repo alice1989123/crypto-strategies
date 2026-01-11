@@ -4,9 +4,9 @@ from typing import List, Dict
 import dotenv
 import pandas as pd
 dotenv.load_dotenv(".env")
-def fetch_latest_prediction_with_metadata(coin: str, model_name: str):
+def fetch_latest_prediction_with_metadata(coin: str,  interval: str, model_name: str) :
     conn = psycopg2.connect(
-        dbname="crypto_predictions",
+        dbname=os.getenv("DBNAME"),
         user=os.getenv("DBUSER"),
         password=os.getenv("DBPASSWORD"),
         host=os.getenv("DBHOST"),
@@ -15,14 +15,14 @@ def fetch_latest_prediction_with_metadata(coin: str, model_name: str):
 
     # Fetch the latest metadata entry
     cursor.execute("""
-    SELECT id, metadata_json
-    FROM prediction_metadata
+    SELECT prediction_id, metadata_json
+    FROM prediction_runs
     WHERE coin = %s
       AND model_name = %s
-      AND "interval" = '1h'
+      AND "interval" = %s
     ORDER BY created_at DESC
     LIMIT 1
-    """, (coin, model_name, "1h"))
+    """, (coin, model_name, interval))
     row = cursor.fetchone()
 
     if not row:
@@ -32,8 +32,8 @@ def fetch_latest_prediction_with_metadata(coin: str, model_name: str):
 
     # Fetch with is_historical flag
     cursor.execute("""
-        SELECT prediction_time, price, is_historical FROM predicted_prices
-        WHERE id = %s ORDER BY prediction_time ASC
+        SELECT point_time, value, is_historical FROM predicted_prices
+        WHERE prediction_id = %s ORDER BY point_time ASC
     """, (prediction_id,))
     rows = cursor.fetchall()
 
@@ -47,7 +47,7 @@ def fetch_latest_prediction_with_metadata(coin: str, model_name: str):
     return historical, forecast, metadata_json
 
 
-def get_stored_klines(coin: str, start: str, end: str, interval: str = "1h") -> pd.DataFrame:
+def get_stored_klines(coin: str, start: str, end: str, interval: str ) -> pd.DataFrame:
     start_ts = pd.to_datetime(start)
     end_ts = pd.to_datetime(end)
 

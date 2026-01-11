@@ -9,18 +9,18 @@ from app.notifications.telegram import send_strategy_signal_via_telegram
 from app.strategies.rsi_momentum import RSIMomentumStrategy
 
 
-async def run_for_coin(coin: str, since_days: int = 21):
+async def run_for_coin(coin: str, interval: str, since_days: int = 21):
     print(f"🔍 Fetching predictions for {coin}...")
     model = "GRU"
 
     end = datetime.utcnow()
     start = end - timedelta(days=since_days)
 
-    historical, forecast, metadata = fetch_latest_prediction_with_metadata(coin, model)
-    df = get_stored_klines(coin, start=start.strftime("%Y-%m-%d"), end=end.strftime("%Y-%m-%d"))
+    historical, forecast, metadata = fetch_latest_prediction_with_metadata(coin, interval, model)
+    df = get_stored_klines(coin, start=start.strftime("%Y-%m-%d"), end=end.strftime("%Y-%m-%d") , interval=interval)
 
     # Strategy 1: forecast
-    strategy = ForecastStrategy(fee_pct=0.005, extra_gain=0.002, extra_loss=0.0025)
+    strategy = ForecastStrategy(fee_pct=0.005, extra_gain=0.001, extra_loss=0.0015)
     decision = strategy.evaluate(historical, forecast)
 
     # Strategy 2: RSI confirmation
@@ -52,16 +52,20 @@ async def run_for_coin(coin: str, since_days: int = 21):
 async def main():
     parser = argparse.ArgumentParser(description="Run strategies and emit signals.")
     parser.add_argument("--symbol", help="Single symbol, e.g. BTCUSDT")
-    parser.add_argument("--since-days", type=int, default=21, help="History window in days (default: 21)")
+    parser.add_argument("--since-days", type=int, default=2, help="History window in days (default: 21)")
+    parser.add_argument("--interval", type=str, default="1h", help="Kline interval (default: 1h)")
     args = parser.parse_args()
     coin = args.symbol 
+    interval = args.interval
     if not coin:
         raise ValueError("--symbol is required")
+    if not interval:
+        raise ValueError("--interval is required")
 
     # Run sequentially (simple & deterministic). If you want, gather() to parallelize.
     
     try:
-        await run_for_coin(coin, since_days=args.since_days)
+        await run_for_coin(coin, interval, since_days=args.since_days)
     except Exception as e:
         # don't stop the whole batch on one failure
         print(f"❌ Error processing {coin}: {e}")
