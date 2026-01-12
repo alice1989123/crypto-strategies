@@ -32,7 +32,7 @@ def fetch_latest_prediction_with_metadata(coin: str,  interval: str, model_name:
 
     # Fetch with is_historical flag
     cursor.execute("""
-        SELECT point_time, value, is_historical FROM predicted_prices
+        SELECT point_time, value, is_historical FROM prediction_points
         WHERE prediction_id = %s ORDER BY point_time ASC
     """, (prediction_id,))
     rows = cursor.fetchall()
